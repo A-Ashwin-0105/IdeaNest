@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Collaborations – IdeaNest</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/app.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .collab-card { background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius); padding: 24px; transition: var(--transition); }
+    .collab-card:hover { border-color: rgba(245,197,24,0.2); }
+    .member-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .member-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--clr-border); border-radius: 99px; padding: 5px 12px; font-size: 0.8rem; }
+    .member-chip .m-avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--clr-teal), #6366f1); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; }
+    .open-roles { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .open-role { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 99px; background: rgba(14,165,233,0.08); border: 1px dashed rgba(14,165,233,0.3); font-size: 0.75rem; color: var(--clr-teal); cursor: pointer; transition: var(--transition); }
+    .open-role:hover { background: rgba(14,165,233,0.15); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">🪺 IdeaNest</div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Discover</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="explore.html"><i class="fas fa-compass"></i> Explore Ideas</a>
+      <a href="investors.html"><i class="fas fa-hand-holding-usd"></i> Find Investors</a>
+      <div class="nav-section">My Work</div>
+      <a href="submit-idea.html"><i class="fas fa-plus-circle"></i> Submit Idea</a>
+      <a href="my-ideas.html"><i class="fas fa-lightbulb"></i> My Ideas</a>
+      <a href="collaborations.html" class="active"><i class="fas fa-users"></i> Collaborations</a>
+      <div class="nav-section">Account</div>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="../index.html" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Guest</div>
+          <div class="user-role" id="sidebarRole">Innovator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="app-topbar">
+      <div>
+        <div class="app-topbar-title">Collaborations</div>
+        <div style="color:var(--clr-muted);font-size:0.88rem;margin-top:2px">Find ideas to collaborate on or manage your team</div>
+      </div>
+    </div>
+
+    <div class="alert alert-info" style="margin-bottom:24px">
+      <i class="fas fa-info-circle"></i> Ideas below are looking for collaborators. Click <strong>"Apply to Join"</strong> on any role to express interest!
+    </div>
+
+    <div id="collabGrid" style="display:flex;flex-direction:column;gap:16px"></div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+  function renderCollabs() {
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const collabIdeas = ideas.filter(i => i.teamNeeds && i.teamNeeds.length > 0);
+    const grid = document.getElementById('collabGrid');
+    if (collabIdeas.length === 0) {
+      grid.innerHTML = `<div style="text-align:center;padding:60px;color:var(--clr-muted)"><div style="font-size:3rem;margin-bottom:12px">🤝</div><p>No ideas looking for collaborators yet. Submit an idea and list your team needs!</p></div>`;
+      return;
+    }
+    grid.innerHTML = collabIdeas.map(idea => `
+      <div class="collab-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
+          <div>
+            <h3 style="font-family:var(--font-display);font-size:1.05rem;font-weight:800;margin-bottom:4px">${idea.title}</h3>
+            <span class="tag tag-${idea.category}">${idea.category}</span>
+          </div>
+          <span class="status status-${idea.stage || 'concept'}">${idea.stage || 'concept'}</span>
+        </div>
+        <p style="font-size:0.86rem;color:var(--clr-soft);line-height:1.6;margin-bottom:14px">${idea.desc}</p>
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--clr-muted);margin-bottom:8px">Open Roles</div>
+          <div class="open-roles">
+            ${idea.teamNeeds.map(role => `<span class="open-role" onclick="applyRole('${idea.id}','${role}')"><i class="fas fa-plus"></i> ${role}</span>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--clr-border)">
+          <div class="author-chip">
+            <div class="author-avatar">${idea.authorName ? idea.authorName[0] : '?'}</div>
+            <span class="author-name">${idea.authorName || 'Unknown'}</span>
+          </div>
+          <span class="meta-item"><i class="fas fa-chevron-up"></i> ${idea.votes} votes</span>
+          <span class="meta-item"><i class="fas fa-users"></i> ${idea.collaborators ? idea.collaborators.length : 0} members</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function applyRole(ideaId, role) {
+    const user = JSON.parse(localStorage.getItem('ideaNestUser') || '{}');
+    if (!user.name) { showToast('Please log in to apply!', 'error'); return; }
+    showToast(`Applied to join as ${role}! 🤝 The idea owner will be notified.`);
+  }
+
+  renderCollabs();
+</script>
+</body>
+</html>

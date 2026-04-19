@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile – IdeaNest</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/app.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .profile-card { background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+    .edit-profile-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .edit-profile-form .full { grid-column: 1 / -1; }
+    .save-btn { padding: 11px 28px; background: linear-gradient(135deg, var(--clr-gold), var(--clr-amber)); color: #0a0d14; border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .save-btn:hover { opacity: 0.88; }
+    .profile-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--clr-border); padding: 0 28px; margin-bottom: 0; }
+    .profile-tab { padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: var(--clr-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); }
+    .profile-tab.active { color: var(--clr-gold); border-bottom-color: var(--clr-gold); }
+    .profile-tab-content { padding: 24px 28px; display: none; }
+    .profile-tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">🪺 IdeaNest</div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Discover</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="explore.html"><i class="fas fa-compass"></i> Explore Ideas</a>
+      <a href="investors.html"><i class="fas fa-hand-holding-usd"></i> Find Investors</a>
+      <div class="nav-section">My Work</div>
+      <a href="submit-idea.html"><i class="fas fa-plus-circle"></i> Submit Idea</a>
+      <a href="my-ideas.html"><i class="fas fa-lightbulb"></i> My Ideas</a>
+      <a href="collaborations.html"><i class="fas fa-users"></i> Collaborations</a>
+      <div class="nav-section">Account</div>
+      <a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
+      <a href="../index.html" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Guest</div>
+          <div class="user-role" id="sidebarRole">Innovator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="app-topbar">
+      <div class="app-topbar-title">My Profile</div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-banner"></div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-lg" id="profileAvatarLg">?</div>
+      </div>
+      <div class="profile-info">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="profile-name" id="profileName">–</div>
+            <div class="profile-role" id="profileRole">–</div>
+            <div class="profile-bio" id="profileBio" style="margin-top:8px"></div>
+          </div>
+          <div style="display:flex;gap:20px">
+            <div style="text-align:center"><div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800" id="profileIdeaCount">0</div><div style="font-size:0.75rem;color:var(--clr-muted)">Ideas</div></div>
+            <div style="text-align:center"><div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800" id="profileVoteCount">0</div><div style="font-size:0.75rem;color:var(--clr-muted)">Votes</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <div class="profile-tab active" onclick="switchTab('edit')">Edit Profile</div>
+        <div class="profile-tab" onclick="switchTab('ideas')">My Ideas</div>
+        <div class="profile-tab" onclick="switchTab('settings')">Settings</div>
+      </div>
+
+      <!-- Edit tab -->
+      <div class="profile-tab-content active" id="tab-edit">
+        <div class="edit-profile-form">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" id="editFirst" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" id="editLast" class="form-input"/>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Bio / Expertise</label>
+            <textarea id="editBio" class="form-textarea" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="editLocation" class="form-input" placeholder="e.g. Bengaluru, India"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn URL</label>
+            <input type="url" id="editLinkedin" class="form-input" placeholder="https://linkedin.com/in/..."/>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Skills (comma separated)</label>
+            <input type="text" id="editSkills" class="form-input" placeholder="e.g. React, Node.js, Product Design"/>
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+      </div>
+
+      <!-- Ideas tab -->
+      <div class="profile-tab-content" id="tab-ideas">
+        <div id="profileIdeasList"></div>
+      </div>
+
+      <!-- Settings tab -->
+      <div class="profile-tab-content" id="tab-settings">
+        <div class="form-group" style="max-width:400px">
+          <label class="form-label">Email Notifications</label>
+          <select class="form-select" id="emailNotif">
+            <option value="all">All Activity</option>
+            <option value="votes">Votes Only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div class="form-group" style="max-width:400px">
+          <label class="form-label">Profile Visibility</label>
+          <select class="form-select">
+            <option value="public">Public</option>
+            <option value="investors">Investors Only</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <button class="save-btn" onclick="showToast('Settings saved!')">Save Settings</button>
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--clr-border)">
+          <h4 style="color:var(--clr-red);margin-bottom:12px">Danger Zone</h4>
+          <button class="btn btn-outline" style="border-color:var(--clr-red);color:var(--clr-red)" onclick="if(confirm('Delete all your data?')){localStorage.clear();window.location.href='../index.html'}">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.profile-tab').forEach((t,i) => t.classList.toggle('active', ['edit','ideas','settings'][i] === name));
+    document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    if (name === 'ideas') renderProfileIdeas();
+  }
+
+  function renderProfileIdeas() {
+    const user = JSON.parse(localStorage.getItem('ideaNestUser') || '{}');
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const mine = ideas.filter(i => i.authorEmail === user.email);
+    const el = document.getElementById('profileIdeasList');
+    if (mine.length === 0) { el.innerHTML = '<p style="color:var(--clr-muted)">No ideas submitted yet.</p>'; return; }
+    el.innerHTML = mine.map(i => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--clr-border)">
+        <div>
+          <div style="font-weight:600;margin-bottom:4px">${i.title}</div>
+          <div style="font-size:0.78rem;color:var(--clr-muted)">${i.votes} votes · ${(i.comments||[]).length} comments</div>
+        </div>
+        <span class="status status-${i.stage||'concept'}">${i.stage||'concept'}</span>
+      </div>`).join('');
+  }
+
+  function saveProfile() {
+    const user = JSON.parse(localStorage.getItem('ideaNestUser') || '{}');
+    user.firstName = document.getElementById('editFirst').value;
+    user.lastName  = document.getElementById('editLast').value;
+    user.name = user.firstName + ' ' + user.lastName;
+    user.bio  = document.getElementById('editBio').value;
+    user.location = document.getElementById('editLocation').value;
+    user.linkedin = document.getElementById('editLinkedin').value;
+    user.skills   = document.getElementById('editSkills').value;
+    localStorage.setItem('ideaNestUser', JSON.stringify(user));
+    showToast('Profile updated! ✨');
+    loadProfile();
+  }
+
+  function loadProfile() {
+    const user = JSON.parse(localStorage.getItem('ideaNestUser') || '{}');
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const mine  = ideas.filter(i => i.authorEmail === user.email);
+    document.getElementById('profileName').textContent  = user.name || user.email || 'Guest';
+    document.getElementById('profileRole').textContent  = (user.role || 'innovator').charAt(0).toUpperCase() + (user.role||'innovator').slice(1);
+    document.getElementById('profileBio').textContent   = user.bio || '';
+    document.getElementById('profileAvatarLg').textContent = (user.name || user.email || '?')[0].toUpperCase();
+    document.getElementById('profileIdeaCount').textContent = mine.length;
+    document.getElementById('profileVoteCount').textContent = mine.reduce((s,i) => s + (i.votes||0), 0);
+    document.getElementById('editFirst').value    = user.firstName || '';
+    document.getElementById('editLast').value     = user.lastName  || '';
+    document.getElementById('editBio').value      = user.bio || '';
+    document.getElementById('editLocation').value = user.location || '';
+    document.getElementById('editLinkedin').value = user.linkedin || '';
+    document.getElementById('editSkills').value   = user.skills || '';
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>

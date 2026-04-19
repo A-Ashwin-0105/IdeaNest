@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Idea – IdeaNest</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/app.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .submit-layout { display: grid; grid-template-columns: 1fr 320px; gap: 28px; align-items: start; }
+    .char-count { font-size: 0.75rem; color: var(--clr-muted); text-align: right; margin-top: 4px; }
+    .stage-selector { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    .stage-btn { border: 2px solid var(--clr-border); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; cursor: pointer; transition: var(--transition); background: transparent; color: var(--clr-text); font-family: var(--font-body); }
+    .stage-btn.selected { border-color: var(--clr-gold); background: rgba(245,197,24,0.08); color: var(--clr-gold); }
+    .stage-btn:hover { border-color: rgba(245,197,24,0.4); }
+    .stage-btn .s-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .stage-btn .s-name { font-size: 0.75rem; font-weight: 700; }
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .skill-chip { display: flex; align-items: center; gap: 6px; background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.25); border-radius: 99px; padding: 4px 12px; font-size: 0.78rem; color: var(--clr-teal); cursor: pointer; }
+    .skill-chip.selected { background: rgba(14,165,233,0.2); }
+    .skill-chip:hover { background: rgba(14,165,233,0.18); }
+    .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--clr-gold), var(--clr-amber)); color: #0a0d14; border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); }
+    .submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .preview-card { background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius); padding: 20px; position: sticky; top: 20px; }
+    .progress-bar { height: 4px; background: var(--clr-border); border-radius: 99px; margin-bottom: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--clr-gold), var(--clr-amber)); border-radius: 99px; transition: width 0.3s ease; }
+    @media (max-width: 900px) { .submit-layout { grid-template-columns: 1fr; } .stage-selector { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">🪺 IdeaNest</div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Discover</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="explore.html"><i class="fas fa-compass"></i> Explore Ideas</a>
+      <a href="investors.html"><i class="fas fa-hand-holding-usd"></i> Find Investors</a>
+      <div class="nav-section">My Work</div>
+      <a href="submit-idea.html" class="active"><i class="fas fa-plus-circle"></i> Submit Idea</a>
+      <a href="my-ideas.html"><i class="fas fa-lightbulb"></i> My Ideas</a>
+      <a href="collaborations.html"><i class="fas fa-users"></i> Collaborations</a>
+      <div class="nav-section">Account</div>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="../index.html" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Guest</div>
+          <div class="user-role" id="sidebarRole">Innovator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="app-topbar">
+      <div>
+        <div class="app-topbar-title">Submit an Idea</div>
+        <div style="color:var(--clr-muted);font-size:0.88rem;margin-top:2px">Share your innovation with the world</div>
+      </div>
+    </div>
+
+    <div id="submitAlert"></div>
+
+    <div class="submit-layout">
+      <!-- Form -->
+      <div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+        <div class="card" style="margin-bottom:20px">
+          <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:20px">Basic Information</h3>
+          <div class="form-group">
+            <label class="form-label">Idea Title *</label>
+            <input type="text" id="ideaTitle" class="form-input" placeholder="e.g. EcoTrack – Carbon Footprint AI" maxlength="80" oninput="updatePreview();updateProgress()"/>
+            <div class="char-count"><span id="titleCount">0</span>/80</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select id="ideaCategory" class="form-select" onchange="updatePreview();updateProgress()">
+              <option value="">Select a category...</option>
+              <option value="startup">🌱 Startup / General</option>
+              <option value="edtech">🎓 EdTech</option>
+              <option value="health">🏥 HealthTech</option>
+              <option value="fintech">💳 Fintech</option>
+              <option value="social">🌍 Social Impact</option>
+              <option value="other">🔧 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Short Description *</label>
+            <textarea id="ideaDesc" class="form-textarea" placeholder="Describe your idea in 2-3 sentences. What problem does it solve? Who is it for?" maxlength="400" rows="4" oninput="updatePreview();updateProgress()"></textarea>
+            <div class="char-count"><span id="descCount">0</span>/400</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Detailed Problem Statement</label>
+            <textarea id="ideaProblem" class="form-textarea" placeholder="Describe the specific problem or pain point this idea addresses..." rows="3" oninput="updateProgress()"></textarea>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:20px">Idea Stage</h3>
+          <div class="stage-selector" id="stageSelector">
+            <button class="stage-btn selected" onclick="selectStage('concept',this)">
+              <div class="s-icon">💭</div><div class="s-name">Concept</div>
+            </button>
+            <button class="stage-btn" onclick="selectStage('validated',this)">
+              <div class="s-icon">✅</div><div class="s-name">Validated</div>
+            </button>
+            <button class="stage-btn" onclick="selectStage('progress',this)">
+              <div class="s-icon">🚀</div><div class="s-name">In Progress</div>
+            </button>
+            <button class="stage-btn" onclick="selectStage('funded',this)">
+              <div class="s-icon">💰</div><div class="s-name">Seeking Funds</div>
+            </button>
+          </div>
+          <input type="hidden" id="ideaStage" value="concept"/>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:8px">Team Needs</h3>
+          <p style="font-size:0.83rem;color:var(--clr-muted);margin-bottom:16px">What roles are you looking for? (Select all that apply)</p>
+          <div class="skill-chips" id="skillChips">
+            <span class="skill-chip" onclick="toggleSkill(this,'Developer')">👨‍💻 Developer</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Designer')">🎨 Designer</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Marketing')">📢 Marketing</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Business Dev')">💼 Business Dev</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Data Scientist')">📊 Data Scientist</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Finance')">💵 Finance</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Legal')">⚖️ Legal</span>
+            <span class="skill-chip" onclick="toggleSkill(this,'Domain Expert')">🎓 Domain Expert</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+          <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:20px">Additional Details</h3>
+          <div class="form-group">
+            <label class="form-label">Target Market / Audience</label>
+            <input type="text" id="ideaMarket" class="form-input" placeholder="e.g. College students in India, ages 18-24"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estimated Budget Needed</label>
+            <select id="ideaBudget" class="form-select">
+              <option value="">Not specified</option>
+              <option value="<10k">Less than ₹10L</option>
+              <option value="10-50k">₹10L – ₹50L</option>
+              <option value="50-200k">₹50L – ₹2Cr</option>
+              <option value=">200k">₹2Cr+</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pitch Deck / Docs URL (optional)</label>
+            <input type="url" id="ideaDoc" class="form-input" placeholder="https://drive.google.com/..."/>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="submitIdea()">
+          🚀 Submit to Community
+        </button>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-card">
+        <h4 style="font-family:var(--font-display);font-size:0.95rem;font-weight:800;margin-bottom:14px;color:var(--clr-muted)">Live Preview</h4>
+        <div class="idea-card" style="cursor:default">
+          <div class="idea-card-header">
+            <div class="idea-card-title" id="previewTitle" style="color:var(--clr-muted)">Your idea title will appear here...</div>
+          </div>
+          <div id="previewTag"></div>
+          <div class="idea-card-desc" id="previewDesc">Your description will show up as you type...</div>
+          <div class="idea-card-meta">
+            <div class="idea-meta-info">
+              <span class="meta-item"><i class="fas fa-chevron-up"></i> 0 votes</span>
+              <span class="meta-item"><i class="fas fa-comment"></i> 0 comments</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;font-size:0.78rem;color:var(--clr-muted);text-align:center">
+          Form completion: <strong id="progressText">0%</strong>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/submit.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Ideas – IdeaNest</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/app.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .lifecycle-track { display: flex; align-items: center; gap: 0; margin: 16px 0; flex-wrap: wrap; }
+    .lifecycle-step { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 99px; background: var(--clr-card); border: 1.5px solid var(--clr-border); color: var(--clr-muted); white-space: nowrap; }
+    .lifecycle-step.done { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--clr-green); }
+    .lifecycle-step.current { background: rgba(245,197,24,0.12); border-color: var(--clr-gold); color: var(--clr-gold); }
+    .lifecycle-arrow { color: var(--clr-border); margin: 0 4px; font-size: 0.85rem; }
+    .idea-manage-card { background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius); padding: 22px; transition: var(--transition); margin-bottom: 16px; }
+    .idea-manage-card:hover { border-color: rgba(245,197,24,0.2); }
+    .manage-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--clr-muted); }
+    .empty-state .empty-icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state h3 { font-family: var(--font-display); font-size: 1.3rem; color: var(--clr-text); margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">🪺 IdeaNest</div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Discover</div>
+      <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="explore.html"><i class="fas fa-compass"></i> Explore Ideas</a>
+      <a href="investors.html"><i class="fas fa-hand-holding-usd"></i> Find Investors</a>
+      <div class="nav-section">My Work</div>
+      <a href="submit-idea.html"><i class="fas fa-plus-circle"></i> Submit Idea</a>
+      <a href="my-ideas.html" class="active"><i class="fas fa-lightbulb"></i> My Ideas</a>
+      <a href="collaborations.html"><i class="fas fa-users"></i> Collaborations</a>
+      <div class="nav-section">Account</div>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="../index.html" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">Guest</div>
+          <div class="user-role" id="sidebarRole">Innovator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="app-topbar">
+      <div>
+        <div class="app-topbar-title">My Ideas</div>
+        <div style="color:var(--clr-muted);font-size:0.88rem;margin-top:2px">Track and manage your submitted ideas</div>
+      </div>
+      <a href="submit-idea.html" class="btn btn-gold"><i class="fas fa-plus"></i> New Idea</a>
+    </div>
+
+    <div id="myIdeasContainer"></div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+  function renderMyIdeas() {
+    const user = JSON.parse(localStorage.getItem('ideaNestUser') || '{}');
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const myIdeas = ideas.filter(i => i.authorEmail === user.email);
+    const container = document.getElementById('myIdeasContainer');
+
+    if (myIdeas.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">💭</div>
+          <h3>No Ideas Yet</h3>
+          <p style="margin-bottom:24px">You haven't submitted any ideas. Share your first one with the community!</p>
+          <a href="submit-idea.html" class="btn btn-gold">Submit Your First Idea</a>
+        </div>`;
+      return;
+    }
+
+    const stageOrder = ['concept','validated','progress','funded','launched'];
+    const stageLabels = { concept:'💭 Concept', validated:'✅ Validated', progress:'🚀 In Progress', funded:'💰 Funded', launched:'🎉 Launched' };
+
+    container.innerHTML = myIdeas.map(idea => {
+      const idx = stageOrder.indexOf(idea.stage || 'concept');
+      const track = stageOrder.map((s,i) => `
+        <span class="lifecycle-step ${i < idx ? 'done' : i === idx ? 'current' : ''}">${stageLabels[s]}</span>
+        ${i < stageOrder.length - 1 ? '<span class="lifecycle-arrow">→</span>' : ''}
+      `).join('');
+      return `
+        <div class="idea-manage-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
+            <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:800">${idea.title}</h3>
+            <span class="tag tag-${idea.category}">${idea.category}</span>
+          </div>
+          <p style="font-size:0.87rem;color:var(--clr-soft);margin-bottom:14px;line-height:1.6">${idea.desc}</p>
+          <div class="lifecycle-track">${track}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:16px">
+              <span class="meta-item"><i class="fas fa-chevron-up"></i> ${idea.votes} votes</span>
+              <span class="meta-item"><i class="fas fa-comment"></i> ${(idea.comments||[]).length} comments</span>
+              <span class="meta-item"><i class="fas fa-calendar"></i> ${new Date(idea.createdAt).toLocaleDateString()}</span>
+            </div>
+            <div class="manage-actions">
+              <button class="btn btn-outline" style="font-size:0.8rem;padding:7px 14px" onclick="advanceStage('${idea.id}')">Advance Stage →</button>
+              <button class="btn btn-ghost" style="font-size:0.8rem;padding:7px 14px" onclick="deleteIdea('${idea.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function advanceStage(id) {
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const stageOrder = ['concept','validated','progress','funded','launched'];
+    const idea = ideas.find(i => i.id === id);
+    if (!idea) return;
+    const curr = stageOrder.indexOf(idea.stage || 'concept');
+    if (curr < stageOrder.length - 1) {
+      idea.stage = stageOrder[curr + 1];
+      localStorage.setItem('ideaNestIdeas', JSON.stringify(ideas));
+      showToast('Stage advanced! 🚀');
+      renderMyIdeas();
+    } else {
+      showToast('Already at final stage!', 'info');
+    }
+  }
+
+  function deleteIdea(id) {
+    if (!confirm('Delete this idea? This cannot be undone.')) return;
+    const ideas = JSON.parse(localStorage.getItem('ideaNestIdeas') || '[]');
+    const filtered = ideas.filter(i => i.id !== id);
+    localStorage.setItem('ideaNestIdeas', JSON.stringify(filtered));
+    showToast('Idea deleted.');
+    renderMyIdeas();
+  }
+
+  renderMyIdeas();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In – IdeaNest</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .auth-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+    .auth-left {
+      background: linear-gradient(135deg, #0f1624 0%, #0a0d14 100%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 60px 60px;
+      position: relative; overflow: hidden;
+    }
+    .auth-left::before {
+      content: '';
+      position: absolute; top: -100px; right: -100px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,197,24,0.12), transparent);
+    }
+    .auth-left-content { position: relative; z-index: 1; max-width: 380px; width: 100%; }
+    .auth-logo { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; margin-bottom: 40px; }
+    .auth-heading { font-family: var(--font-display); font-size: 2.4rem; font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+    .auth-sub { color: var(--clr-soft); font-size: 0.95rem; line-height: 1.6; margin-bottom: 40px; }
+    .testimonial { background: var(--clr-card); border: 1px solid var(--clr-border); border-radius: var(--radius); padding: 20px; }
+    .testimonial-text { font-size: 0.9rem; color: var(--clr-soft); line-height: 1.65; margin-bottom: 14px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .t-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--clr-teal), #6366f1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: white; }
+    .t-name { font-size: 0.85rem; font-weight: 600; }
+    .t-role { font-size: 0.75rem; color: var(--clr-muted); }
+    .auth-right { display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--clr-surface); }
+    .auth-form-box { width: 100%; max-width: 420px; }
+    .auth-form-box h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+    .auth-form-box p  { color: var(--clr-soft); font-size: 0.9rem; margin-bottom: 32px; }
+    .auth-form-box p a { color: var(--clr-gold); font-weight: 600; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; color: var(--clr-muted); font-size: 0.8rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--clr-border); }
+    .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.04); border: 1.5px solid var(--clr-border); color: var(--clr-text); font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: var(--transition); margin-bottom: 12px; }
+    .social-btn:hover { border-color: var(--clr-soft); }
+    .form-submit { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--clr-gold), var(--clr-amber)); color: #0a0d14; border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); }
+    .form-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .forgot-link { text-align: right; }
+    .forgot-link a { font-size: 0.82rem; color: var(--clr-gold); }
+    @media (max-width: 768px) { .auth-layout { grid-template-columns: 1fr; } .auth-left { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="auth-layout">
+    <!-- Left panel -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-logo">🪺 IdeaNest</div>
+        <h1 class="auth-heading">Turn Your <span class="gradient-text">Vision</span> Into Reality</h1>
+        <p class="auth-sub">Join thousands of innovators who have launched their ideas from this platform. Find your team, get feedback, and attract investors.</p>
+        <div class="testimonial">
+          <p class="testimonial-text">"IdeaNest connected me with my co-founder and our lead investor within 3 months. We're now a funded startup!"</p>
+          <div class="testimonial-author">
+            <div class="t-avatar">AK</div>
+            <div>
+              <div class="t-name">Arjun Kumar</div>
+              <div class="t-role">Founder, EcoTrack</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right form -->
+    <div class="auth-right">
+      <div class="auth-form-box">
+        <h2>Welcome back 👋</h2>
+        <p>New here? <a href="register.html">Create a free account</a></p>
+
+        <div id="loginAlert"></div>
+
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <img src="https://www.google.com/favicon.ico" width="18" alt="Google"/> Continue with Google
+        </button>
+        <button class="social-btn" onclick="socialLogin('GitHub')">
+          <i class="fab fa-github"></i> Continue with GitHub
+        </button>
+
+        <div class="divider">or sign in with email</div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••"/>
+          <div class="forgot-link" style="margin-top:6px"><a href="#">Forgot password?</a></div>
+        </div>
+
+        <button class="form-submit" onclick="handleLogin()">Sign In to IdeaNest</button>
+
+        <p style="text-align:center;margin-top:20px;font-size:0.8rem;color:var(--clr-muted)">
+          Demo: use any email + password "demo123"
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+</body>
+</html>
