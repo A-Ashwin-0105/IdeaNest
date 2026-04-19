@@ -124,7 +124,3 @@ All data is stored in localStorage under these keys:
 - Mobile app with React Native
 
 ---
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
